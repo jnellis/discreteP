@@ -10,7 +10,7 @@ import static net.jnellis.probability.CumulativeOperation.*
  *
  */
 class PoissonTest extends Specification {
-  def resolution = 1.0E-12
+  double  resolution = 1.0E-12
 
   def "test cumulative probability against TI-89 function TIStat.poissCdf"() {
     setup:
