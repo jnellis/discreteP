@@ -35,7 +35,6 @@ public class Poisson extends DiscreteProbability {
     // split eulers exponent into integral and fractional parts
     int integral = (int) lambda;
     double fractional = lambda - integral;
-    double reciprocalE = Math.exp(-1.0);
     //counters
     int lambdas = randomVariable;
     int denoms = randomVariable;
