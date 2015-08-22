@@ -1,8 +1,5 @@
 package net.jnellis.probability;
 
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-
 /**
  * User: Joe Nellis
  * Date: 8/9/2015
@@ -56,6 +53,7 @@ public class Binomial extends DiscreteProbability {
     double p = chanceOfSuccess;
     double q = 1.0 - chanceOfSuccess;
 
+    // Early Optimizations:
     // The factorial and P components cancel out leaving the Q component.
     if (y == 0) {
       return Math.pow(q, n);
@@ -69,22 +67,21 @@ public class Binomial extends DiscreteProbability {
     // we can easily cancel out (n-y)! or y! but not both so
     // choose the larger of the two denominators to cancel out and
     // keep the smaller denominator component.
-    int denominatorRange = Integer.min(n - y, y);
-
-    // the (n - denominatorRange) to n components of the numerator factorial
-    DoubleStream numerators = IntStream.rangeClosed(n - denominatorRange + 1, n)
-                                       .asDoubleStream();
+    int range = Integer.min(n - y, y);
 
     // counters of p, q, numerators, and denominators
     int pees = y;
     int ques = n - y;
-    int denom = denominatorRange;
+    int denom = range;
+    int numer = n;
+    int numerFloor = n - range;
     double result = 1.0;
 
-    // count down the numerators from highest to lowest
-    for (int numer = n; numer > (n - denominatorRange); numer--) {
-      result *= numer;
-      while (result >= 1.0) {
+    // While loop soup - computing the result by multiplying by components
+    // of the equation in order to maintain an intermediate result that
+    // floats around 1.0 if possible.
+    while (pees > 0 || numer > numerFloor) {
+      if (result >= 1.0 || numer == numerFloor) { // lowering values
         if (denom > 1) {
           result = result / denom;
           denom--;
@@ -97,16 +94,16 @@ public class Binomial extends DiscreteProbability {
         } else {
           throw new IllegalStateException("unexpected end of small values");
         }
+
+      } else { //increasing values
+        if (numer > numerFloor) {
+          result *= numer;
+          numer--;
+        } else {
+          throw new IllegalStateException("unexpected end of large values");
+        }
       }
     }
-    // multiply by remaining p's, q's, and denominators.
-    result *= Math.pow(p, pees);
-    result *= Math.pow(q, ques);
-    while (denom > 1) {
-      result /= denom;
-      denom--;
-    }
-
     return result;
   }
 
