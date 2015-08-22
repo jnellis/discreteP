@@ -26,6 +26,10 @@ public interface Probability {
     return 1.0d / value;
   }
 
+  static double reciprocal(double value) {
+    return 1.0d / value;
+  }
+
   static double product(double left, double right) {
     return left * right;
   }
