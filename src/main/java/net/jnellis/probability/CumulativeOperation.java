@@ -16,11 +16,13 @@ public interface CumulativeOperation {
 
   CumulativeOperation lessThan =
       (p, rv) -> IntStream.range(0, rv)
+                          .parallel()
                           .mapToDouble(p::applyAsDouble)
                           .sum();
 
   CumulativeOperation lessThanOrEqual =
       (p, rv) -> IntStream.rangeClosed(0, rv)
+                          .parallel()
                           .mapToDouble(p::applyAsDouble)
                           .sum();
 
