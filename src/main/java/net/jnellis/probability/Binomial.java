@@ -10,7 +10,7 @@ public class Binomial extends DiscreteProbability {
   private final int trials;
   private final double chanceOfSuccess;
 
-  public Binomial(net.jnellis.probability.CumulativeOperation rvOperation,
+  public Binomial(CumulativeOperation rvOperation,
                   int trials,
                   double chanceOfSuccess) {
     super(rvOperation);

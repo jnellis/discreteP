@@ -9,7 +9,7 @@ public class Geometric extends DiscreteProbability {
 
   private final double p;
 
-  public Geometric(net.jnellis.probability.CumulativeOperation rvOperation,
+  public Geometric(CumulativeOperation rvOperation,
                    double chanceOfSuccess) {
     super(rvOperation);
     this.p = chanceOfSuccess;

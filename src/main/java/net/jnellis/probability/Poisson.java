@@ -9,7 +9,7 @@ public class Poisson extends DiscreteProbability {
 
   private final double lambda;
 
-  public Poisson(net.jnellis.probability.CumulativeOperation rvOperation,
+  public Poisson(CumulativeOperation rvOperation,
                  double lambda) {
     super(rvOperation);
     this.lambda = lambda;
