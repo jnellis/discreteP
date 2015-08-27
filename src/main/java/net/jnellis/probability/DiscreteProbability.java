@@ -10,15 +10,15 @@ import java.util.Optional;
 public abstract class DiscreteProbability implements Probability  {
 
 
-  private final net.jnellis.probability.CumulativeOperation rvOperation;
+  private final CumulativeOperation rvOperation;
 
 
-  DiscreteProbability(net.jnellis.probability.CumulativeOperation rvOperation) {
+  DiscreteProbability(CumulativeOperation rvOperation) {
     this.rvOperation = Optional.of(rvOperation).get();
   }
 
   @Override
-  public net.jnellis.probability.CumulativeOperation getCumulativeRandomVariable() {
+  public CumulativeOperation getCumulativeRandomVariable() {
     return rvOperation;
   }
 

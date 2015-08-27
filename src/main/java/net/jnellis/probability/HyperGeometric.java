@@ -1,7 +1,8 @@
 package net.jnellis.probability;
 
-import java.util.Arrays;
+import java.util.PrimitiveIterator;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * User: Joe Nellis
@@ -10,26 +11,26 @@ import java.util.stream.IntStream;
  */
 public class HyperGeometric extends DiscreteProbability {
 
-  final int populationSize;
-  final int sampleSize;
-  final int successStates;
+  final int N;
+  final int n;
+  final int r;
 
   /**
    * The Hypergeometric probability distribution.
    *
-   * @param rvOperation
+   * @param rvOperation    CumulativeOperation to apply
    * @param populationSize Population size
    * @param sampleSize     Size of sample drawn from population.
    * @param successStates  Number of Success items in the population.
    */
-  public HyperGeometric(net.jnellis.probability.CumulativeOperation rvOperation,
+  public HyperGeometric(CumulativeOperation rvOperation,
                         int populationSize,
                         int sampleSize,
                         int successStates) {
     super(rvOperation);
-    this.populationSize = populationSize;
-    this.sampleSize = sampleSize;
-    this.successStates = successStates;
+    this.N = populationSize;
+    this.n = sampleSize;
+    this.r = successStates;
   }
 
   // The equation: (rCy)*((N-r)C(n-y))/(NCn)
@@ -43,82 +44,73 @@ public class HyperGeometric extends DiscreteProbability {
 */
   @Override
   public double computeResult(int randomVariable) {
-    return probability(populationSize, sampleSize, successStates, randomVariable);
+    return probability(N, n, r, randomVariable);
   }
 
   public static double probability(int N, int n, int r, int y) {
+    if (N == 0)
+      return 0.0;
     assert (y <= r);
     assert (n - y <= N - r);
     assert (y >= 0);
     assert (N > 0);
     assert (r >= 0);
     assert (n >= 0);
-    if (N == 0)
-      return 0.0;
-    double result = 1.0;
-
-    int numer1, numer2, numer3, numer1cmp, numer2cmp, numer3cmp;
-    int denom1, denom2, denom3, range1, range2, range3;
-    numer1 = numer1cmp = r;
-    numer2 = numer2cmp = N - r;
-    numer3 = numer3cmp = N;
 
     //optimization on (rCy)
-    range1 = denom1 = Integer.min(r - y, y);
-
+    int range1 = Integer.min(r - y, y);
     //optimization on ((N-r)C(n-y))
-    range2 = denom2 = Integer.min((N - r) - (n - y), n - y);
-
+    int range2 = Integer.min((N - r) - (n - y), n - y);
     //optimization on (NCn)
-    range3 = denom3 = Integer.min(N - n, n);
+    int range3 = Integer.min(N - n, n);
 
-    while (numer3 > numer3cmp - range3 || denom3 > 1) {
-      if (result > 1.0 || denom3 == 1) {
-        if (denom1 > 1)
-          result = result / denom1--;
-        else if (denom2 > 1)
-          result = result / denom2--;
-        else if (numer3 > numer3cmp - range3)
-          result = result / numer3--;
-        else
-          throw new IllegalStateException("HyperGeometric Probability error- premature end of " +
-                                              "divisors");
+
+    // r!/(r-y)!y!  *   (N-r)!/(N-r-(n-y))!(n-y)!  /  N!/(N-n)!n!
+    // swap numerator and denominator on last component, N!/((N-n)!n!)
+    // r-range1+1:r   *   (N-r)-range2+1:(N-r)   *   1:range3   // numerators
+    PrimitiveIterator.OfDouble numerators =
+        Stream.of(IntStream.rangeClosed(r - range1 + 1, r),
+                  IntStream
+                      .rangeClosed(N - r - range2 + 1, N - r),
+                  IntStream.rangeClosed(1, range3))
+              .flatMapToDouble(IntStream::asDoubleStream)
+              .iterator();
+
+    // 1:range1   *   1:range2    *    N-range3+1 : N        // denominators
+    PrimitiveIterator.OfDouble denominators =
+        Stream.of(IntStream.rangeClosed(1, range1),
+                  IntStream.rangeClosed(1, range2),
+                  IntStream.rangeClosed(N - range3 + 1, N))
+              .flatMapToDouble(IntStream::asDoubleStream)
+              .iterator();
+
+    double result = 1.0;
+    while (numerators.hasNext() || denominators.hasNext()) {
+      if (result >= 1.0 || !numerators.hasNext()) {
+        result /= denominators.nextDouble();
       } else {
-        if (numer1 > numer1cmp - range1)
-          result = result * numer1--;
-        else if (numer2 > numer2cmp - range2)
-          result = result * numer2--;
-        else if (denom3 > 1)
-          result = result * denom3--;
-        else
-          throw new IllegalStateException("HyperGeometric Probability error- premature end of " +
-                                              "multipliers");
+        result *= numerators.nextDouble();
       }
     }
     return result;
   }
 
-  static int getFirstGreaterThanOneThenDecrement(int[] factors) {
-    int idx = IntStream.range(0, factors.length)
-                       .filter(i -> factors[i] > 1)
-                       .findFirst()
-                       .getAsInt();
-    return factors[idx]--;
-  }
 
-  static boolean allEqualOne(int[] values) {
-    return Arrays.stream(values).allMatch((val) -> val == 1);
-  }
-
-
+  // The expected value or population mean is defined by:
+// E(Y) = n*r/N
   @Override
   double getExpectedValue() {
-    return 0;
+    return 1.0 * n * r / N;
   }
 
+
+  // The variance is defined by:
+// V(Y) = n * (r/N) * (N-r)/N * (N-n)/(N-1)
   @Override
   double getVariance() {
-    return 0;
+    if (N == 1)
+      return 0.0;
+    return 1.0 * n * r / N * (N - r) / N * (N - n) / (N - 1);
   }
 
 }

@@ -7,13 +7,7 @@ package net.jnellis.probability;
  */
 public interface Probability {
 
-  @FunctionalInterface
-  interface CumulativeOperation
-      extends net.jnellis.probability.CumulativeOperation {
-
-  }
-
-  net.jnellis.probability.CumulativeOperation getCumulativeRandomVariable();
+  CumulativeOperation getCumulativeRandomVariable();
 
   default double getResult(int randomVariable) {
     return this.getCumulativeRandomVariable()
