@@ -1,6 +1,6 @@
 package net.jnellis.probability;
 
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * User: Joe Nellis
@@ -14,7 +14,8 @@ public abstract class DiscreteProbability implements Probability  {
 
 
   DiscreteProbability(CumulativeOperation rvOperation) {
-    this.rvOperation = Optional.of(rvOperation).get();
+    this.rvOperation = Objects.requireNonNull(rvOperation,
+                                              "rvOperation can't be null.");
   }
 
   @Override
