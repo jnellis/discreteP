@@ -16,7 +16,7 @@ class NegativeBinomialTest extends Specification {
     setup:
     double p = 0.2;
     int k = 3;
-    def result = NegativeBinomial.probability(CumulativeOperation.equal, k, p, y)
+    def result = NegativeBinomial.probability( k, p, y)
     expect:
     Math.abs(result - exp) < resolution;
 

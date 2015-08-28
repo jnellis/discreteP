@@ -24,7 +24,7 @@ public class NegativeBinomial extends DiscreteProbability {
 
   @Override
   public double computeResult(int randomVariable) {
-    return probability(getCumulativeRandomVariable(), k, p, randomVariable);
+    return probability( k, p, randomVariable);
   }
 
 
@@ -35,8 +35,7 @@ public class NegativeBinomial extends DiscreteProbability {
       rvOperation - Random variable comparison. Whether this probability is cumulative and which
       way it is.
   */
-  public static double probability(CumulativeOperation rvOperation,
-                                   int k, double p, int y) {
+  public static double probability(int k, double p, int y) {
     // the base class function GetResult will possibly
     // set our number of trials below K so just return 0.0;
     if (k > y || y == 0)

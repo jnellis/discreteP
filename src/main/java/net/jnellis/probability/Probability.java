@@ -1,16 +1,26 @@
+/*
+ * Probability.java
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability;
 
 /**
- * User: Joe Nellis
- * Date: 8/2/2015
- * Time: 6:37 PM
+ * Represents probability distribution function.
  */
 public interface Probability {
 
-  CumulativeOperation getCumulativeRandomVariable();
+  /**
+   * The
+   * @return
+   */
+  CumulativeOperation getCumulativeOperation();
 
   default double getResult(int randomVariable) {
-    return this.getCumulativeRandomVariable()
+    return this.getCumulativeOperation()
                .apply(this::computeResult, randomVariable);
   }
 
@@ -38,4 +48,6 @@ public interface Probability {
   }
 
 
+
 }
+

@@ -14,12 +14,12 @@ public abstract class DiscreteProbability implements Probability  {
 
 
   DiscreteProbability(CumulativeOperation rvOperation) {
-    this.rvOperation = Objects.requireNonNull(rvOperation,
-                                              "rvOperation can't be null.");
+    this.rvOperation =
+        Objects.requireNonNull(rvOperation,"rvOperation can't be null.");
   }
 
   @Override
-  public CumulativeOperation getCumulativeRandomVariable() {
+  public CumulativeOperation getCumulativeOperation() {
     return rvOperation;
   }
 
