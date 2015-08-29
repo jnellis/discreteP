@@ -3,29 +3,85 @@ package net.jnellis.probability;
 import java.util.Objects;
 
 /**
- * User: Joe Nellis
- * Date: 8/12/2015
- * Time: 6:48 PM
+ * An abstract class that represents a discrete probability distribution.
  */
 public abstract class DiscreteProbability implements Probability  {
 
-
   private final CumulativeOperation rvOperation;
 
-
+  /**
+   * Super constructor for derived classes.
+   * @param rvOperation The cumulative operation that will be applied.
+   */
   DiscreteProbability(CumulativeOperation rvOperation) {
     this.rvOperation =
         Objects.requireNonNull(rvOperation,"rvOperation can't be null.");
   }
 
-  @Override
+  /**
+   * Computes the cumulative distribution function of the
+   * probability, given the random variable.
+   * <p>
+   * This does not need to be
+   * overridden unless the cumulative operation can be
+   * computed by means other than summing the probability
+   * distribution function. Override {@link #computeResult} to
+   * provide the PDF that this function uses.
+   *
+   * @param randomVariable The random variable of the
+   *                       probability function
+   * @return The cumulative probability result.
+   */
+   double getResult(int randomVariable) {
+    return this.getCumulativeOperation()
+               .apply(this::computeResult, randomVariable);
+  }
+
+  /**
+   * The CumulativeOperation that will be
+   * applied should the getResult method be called.
+   *
+   * @return The cumulative operation used to compute
+   * this probability.
+   */
   public CumulativeOperation getCumulativeOperation() {
     return rvOperation;
   }
 
-
+  /**
+   * @return  Returns the mean or expected value.
+   */
   abstract double getExpectedValue();
 
+  /**
+   *
+   * @return Returns the variance.
+   */
   abstract double getVariance();
 
+  /**
+   * Returns the reciprocal.
+   */
+  public static double reciprocal(double value) {
+    return 1.0d / value;
+  }
+
+  /**
+   * product of two doubles.
+   */
+  public static double product(double left, double right) {
+    return left * right;
+  }
+
+  /**
+   * greatest common divisor
+   */
+  public static long gcd(long a, long b) {
+    while (b > 0) {
+      long c = a % b;
+      a = b;
+      b = c;
+    }
+    return a;
+  }
 }

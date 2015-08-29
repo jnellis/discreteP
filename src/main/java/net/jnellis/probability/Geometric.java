@@ -19,7 +19,7 @@ public class Geometric extends DiscreteProbability {
   // E(Y) = 1/p
   @Override
   double getExpectedValue() {
-    return p == 0.0 ? Double.POSITIVE_INFINITY : Probability.reciprocal(p);
+    return p == 0.0 ? Double.POSITIVE_INFINITY : reciprocal(p);
   }
 
 
