@@ -1,7 +1,9 @@
 package net.jnellis.probability
 
 import spock.lang.Specification
-import static net.jnellis.probability.CumulativeOperation.*
+import spock.lang.Unroll
+
+import static net.jnellis.probability.CumulativeOperation.equal
 
 /**
  * User: Joe Nellis
@@ -12,19 +14,8 @@ import static net.jnellis.probability.CumulativeOperation.*
 class HyperGeometricTest extends Specification {
   double resolution = 1.0E-12
 
-  def "test chance to only win two bucks back in lottery"() {
-    setup:
-    def N = 50 // fifty numbers
-    def n = 6  // of which only six are chosen
-    def r = 6  // and of which six are special.
-    def y = 2  // probabilty to only match two numbers
-    def result = new HyperGeometric(equal, N, n, r).getResult(y);
-    println "hyperGeometric $result"
-    expect:
-    Math.abs(result - 0.128141932073477) < resolution
-  }
-
-  def "test from table from various online calculators"() {
+  @Unroll
+  def "test #N samples, #n samplesChosen, #r specialSamples, P(y=#rv) is #result"() {
     setup:
 
     expect:
@@ -32,10 +23,21 @@ class HyperGeometricTest extends Specification {
 
     where:
     N   | n   | r  | rv | result
+    1   | 1   | 1  | 1  | 1
     9   | 3   | 3  | 3  | 0.011904761904761897
     55  | 31  | 5  | 3  | 0.35662697149933564
-    1   | 1   | 1  | 1  | 1
     277 | 157 | 57 | 33 | 0.116862766002871
     301 | 300 | 30 | 30 | 0.900332225913621
+  }
+
+  def "test chance to only win two bucks back in lottery"() {
+    setup:
+    def N = 50 // fifty numbers
+    def n = 6  // of which only six are chosen
+    def r = 6  // and of which six are special.
+    def y = 2  // probabilty to only match two numbers
+    def result = new HyperGeometric(equal, N, n, r).getResult(y);
+    expect:
+    Math.abs(result - 0.128141932073477) < resolution
   }
 }

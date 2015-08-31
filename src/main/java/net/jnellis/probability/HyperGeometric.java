@@ -57,39 +57,39 @@ public class HyperGeometric extends DiscreteProbability {
     assert (r >= 0);
     assert (n >= 0);
 
-    //optimization on (rCy)
+    //cancellation optimization on (rCy)
     int range1 = Integer.min(r - y, y);
-    //optimization on ((N-r)C(n-y))
+    //cancellation optimization on ((N-r)C(n-y))
     int range2 = Integer.min((N - r) - (n - y), n - y);
-    //optimization on (NCn)
+    //cancellation optimization on (NCn)
     int range3 = Integer.min(N - n, n);
 
 
     // r!/(r-y)!y!  *   (N-r)!/(N-r-(n-y))!(n-y)!  /  N!/(N-n)!n!
     // swap numerator and denominator on last component, N!/((N-n)!n!)
     // r-range1+1:r   *   (N-r)-range2+1:(N-r)   *   1:range3   // numerators
-    PrimitiveIterator.OfDouble numerators =
+    PrimitiveIterator.OfInt numerators =
         Stream.of(IntStream.rangeClosed(r - range1 + 1, r),
-                  IntStream
-                      .rangeClosed(N - r - range2 + 1, N - r),
+                  IntStream.rangeClosed(N - r - range2 + 1, N - r),
                   IntStream.rangeClosed(1, range3))
-              .flatMapToDouble(IntStream::asDoubleStream)
+              .flatMapToInt(IntStream::sequential)
               .iterator();
 
     // 1:range1   *   1:range2    *    N-range3+1 : N        // denominators
-    PrimitiveIterator.OfDouble denominators =
+    PrimitiveIterator.OfInt denominators =
         Stream.of(IntStream.rangeClosed(1, range1),
                   IntStream.rangeClosed(1, range2),
                   IntStream.rangeClosed(N - range3 + 1, N))
-              .flatMapToDouble(IntStream::asDoubleStream)
+              .flatMapToInt(IntStream::sequential)
               .iterator();
+
 
     double result = 1.0;
     while (numerators.hasNext() || denominators.hasNext()) {
       if (result >= 1.0 || !numerators.hasNext()) {
-        result /= denominators.nextDouble();
+        result /= denominators.nextInt();
       } else {
-        result *= numerators.nextDouble();
+        result *= numerators.nextInt();
       }
     }
     return result;
