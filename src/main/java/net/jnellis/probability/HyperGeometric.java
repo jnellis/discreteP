@@ -5,9 +5,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * User: Joe Nellis
- * Date: 8/24/2015
- * Time: 1:32 PM
+ * The Hypergeometric probability distribution.
  */
 public class HyperGeometric extends DiscreteProbability {
 
@@ -47,6 +45,14 @@ public class HyperGeometric extends DiscreteProbability {
     return probability(N, n, r, randomVariable);
   }
 
+  /**
+   * Computes the HyperGeometric probability of a random variable.
+   * @param N Population size
+   * @param n sample size
+   * @param r number of success states in population.
+   * @param y the number of success states we're interested in.
+   * @return  The probability of this event, between 0.0 and 1.0 inclusive.
+   */
   public static double probability(int N, int n, int r, int y) {
     if (N == 0)
       return 0.0;
@@ -64,21 +70,21 @@ public class HyperGeometric extends DiscreteProbability {
     //cancellation optimization on (NCn)
     int range3 = Integer.min(N - n, n);
 
-
     // r!/(r-y)!y!  *   (N-r)!/(N-r-(n-y))!(n-y)!  /  N!/(N-n)!n!
     // swap numerator and denominator on last component, N!/((N-n)!n!)
+    // Create two streams representing factors of the numerator and denominator
     // r-range1+1:r   *   (N-r)-range2+1:(N-r)   *   1:range3   // numerators
     PrimitiveIterator.OfInt numerators =
         Stream.of(IntStream.rangeClosed(r - range1 + 1, r),
                   IntStream.rangeClosed(N - r - range2 + 1, N - r),
-                  IntStream.rangeClosed(1, range3))
+                  IntStream.rangeClosed(2, range3)) // start at 2
               .flatMapToInt(IntStream::sequential)
               .iterator();
 
     // 1:range1   *   1:range2    *    N-range3+1 : N        // denominators
     PrimitiveIterator.OfInt denominators =
-        Stream.of(IntStream.rangeClosed(1, range1),
-                  IntStream.rangeClosed(1, range2),
+        Stream.of(IntStream.rangeClosed(2, range1), // instead of 1
+                  IntStream.rangeClosed(2, range2),
                   IntStream.rangeClosed(N - range3 + 1, N))
               .flatMapToInt(IntStream::sequential)
               .iterator();

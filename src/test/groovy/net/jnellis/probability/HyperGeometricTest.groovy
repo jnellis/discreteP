@@ -4,6 +4,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static net.jnellis.probability.CumulativeOperation.equal
+import static net.jnellis.probability.CumulativeOperation.lessThanOrEqual
 
 /**
  * User: Joe Nellis
@@ -39,5 +40,19 @@ class HyperGeometricTest extends Specification {
     def result = new HyperGeometric(equal, N, n, r).getResult(y);
     expect:
     Math.abs(result - 0.128141932073477) < resolution
+  }
+
+  def "test cumulative high population"() {
+    setup:
+    def N = 80000
+    def n = 20000
+    def r = 40000
+    def y = 201
+    def result = new HyperGeometric(lessThanOrEqual, N, n, r).getResult(y)
+    println "hypergeometic result $result"
+    expect:
+    (1..n).forEach {
+      assert HyperGeometric.probability(N, n, r, it) < resolution: "y = $it";
+    }
   }
 }
