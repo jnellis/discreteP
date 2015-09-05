@@ -1,3 +1,11 @@
+/*
+ * Geometric.java
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability;
 
 /**
@@ -18,7 +26,7 @@ public class Geometric extends DiscreteProbability {
   // Expected value or population mean is defined by
   // E(Y) = 1/p
   @Override
-  double getExpectedValue() {
+  public double getExpectedValue() {
     return p == 0.0 ? Double.POSITIVE_INFINITY : reciprocal(p);
   }
 
@@ -26,7 +34,7 @@ public class Geometric extends DiscreteProbability {
   // Variance is defined by
   // V(Y)= (1-p)/p^2
   @Override
-  double getVariance() {
+  public double getVariance() {
     return p == 0.0 ? Double.POSITIVE_INFINITY : (1.0 - p) / (p * p);
   }
 

@@ -1,3 +1,11 @@
+/*
+ * DiscreteProbability.java
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability;
 
 import java.util.Objects;
@@ -51,13 +59,13 @@ public abstract class DiscreteProbability implements Probability  {
   /**
    * @return  Returns the mean or expected value.
    */
-  abstract double getExpectedValue();
+  public abstract double getExpectedValue();
 
   /**
    *
    * @return Returns the variance.
    */
-  abstract double getVariance();
+  public abstract double getVariance();
 
   /**
    * Returns the reciprocal.

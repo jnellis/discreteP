@@ -1,3 +1,11 @@
+/*
+ * Poisson.java
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability;
 
 /**
@@ -16,12 +24,12 @@ public class Poisson extends DiscreteProbability {
   }
 
   @Override
-  double getExpectedValue() {
+  public double getExpectedValue() {
     return lambda;
   }
 
   @Override
-  double getVariance() {
+  public double getVariance() {
     return lambda;
   }
 

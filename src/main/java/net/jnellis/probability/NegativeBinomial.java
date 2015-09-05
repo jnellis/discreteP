@@ -1,3 +1,11 @@
+/*
+ * NegativeBinomial.java
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability;
 
 /**
@@ -112,14 +120,14 @@ public class NegativeBinomial extends DiscreteProbability {
   // The Expected Value is defined by
 // E(Y) = K / p
   @Override
-  double getExpectedValue() {
+  public double getExpectedValue() {
     return k / p;
   }
 
   // The variance is defined by
 // o^2 = K*(1-p)/p^2
   @Override
-  double getVariance() {
+  public double getVariance() {
     return k * (1 - p) / (p * p);
   }
 }

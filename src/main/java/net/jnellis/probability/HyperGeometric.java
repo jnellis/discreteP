@@ -170,7 +170,7 @@ public class HyperGeometric extends DiscreteProbability {
    * @return The expected value for this probability distribution.
    */
   @Override
-  double getExpectedValue() {
+  public double getExpectedValue() {
     return 1.0 * n * r / N;
   }
 
@@ -184,7 +184,7 @@ public class HyperGeometric extends DiscreteProbability {
    * @return The variance (?2) of the probability distribution.
    */
   @Override
-  double getVariance() {
+  public double getVariance() {
     if (N == 1)
       return 0.0;
     return 1.0 * n * r / N * (N - r) / N * (N - n) / (N - 1);
