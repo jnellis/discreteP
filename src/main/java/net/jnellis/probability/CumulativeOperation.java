@@ -14,8 +14,8 @@ import java.util.stream.IntStream;
 /**
  * A functional interface that represents a cumulative operation with a probability
  * function and the range of a random variable. The cumulative result is
- * achieved by the summing the probability function result from zero to random
- * variable number of times. The cumulative operation is
+ * achieved by summing the probability function result from zero to some
+ * random variable (y) number of times. The cumulative operation is
  * optimized to only compute the lower range from zero to the random variable.
  * <i>greaterThan</i> and <i>greaterThanOrEqual</i> are derived from subtracting
  * this sum from one.
@@ -24,19 +24,9 @@ import java.util.stream.IntStream;
 public interface CumulativeOperation {
 
   /**
-   * The cumulative operation
-   *
-   * @param randomVariable      The P(Y= ?) random variable of the probability.
-   * @param probabilityFunction A probability function that returns from 0 to 1.0
-   * @return A cumulative probability in the range of 0 to 1.0
-   */
-  double apply(int randomVariable,
-               IntToDoubleFunction probabilityFunction);
-
-  /**
    * Applies only the random variable to the probabilityFunction once.
    */
-  CumulativeOperation equal = (rv,p)-> p.applyAsDouble(rv);
+  CumulativeOperation equal = (rv, p) -> p.applyAsDouble(rv);
 
   /**
    * Computes the sum of the probabilities of the random variable from
@@ -76,5 +66,16 @@ public interface CumulativeOperation {
    */
   CumulativeOperation greaterThanOrEqual =
       (rv, p) -> 1.0 - CumulativeOperation.lessThan.apply(rv, p);
+
+  /**
+   * The cumulative operation
+   *
+   * @param randomVariable      The P(Y= ?) random variable of the probability.
+   * @param probabilityFunction A probability function that returns from 0 to
+   *                            1.0
+   * @return A cumulative probability in the range of 0 to 1.0
+   */
+  double apply(int randomVariable,
+               IntToDoubleFunction probabilityFunction);
 
 }
