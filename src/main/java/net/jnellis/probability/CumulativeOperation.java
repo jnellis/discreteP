@@ -26,23 +26,24 @@ public interface CumulativeOperation {
   /**
    * The cumulative operation
    *
-   * @param probabilityFunction A probability function that returns from 0 to 1.0
    * @param randomVariable      The P(Y= ?) random variable of the probability.
+   * @param probabilityFunction A probability function that returns from 0 to 1.0
    * @return A cumulative probability in the range of 0 to 1.0
    */
-  double apply(IntToDoubleFunction probabilityFunction, int randomVariable);
+  double apply(int randomVariable,
+               IntToDoubleFunction probabilityFunction);
 
   /**
    * Applies only the random variable to the probabilityFunction once.
    */
-  CumulativeOperation equal = IntToDoubleFunction::applyAsDouble;
+  CumulativeOperation equal = (rv,p)-> p.applyAsDouble(rv);
 
   /**
    * Computes the sum of the probabilities of the random variable from
    * zero up to the random variable.
    */
   CumulativeOperation lessThan =
-      (p, rv) -> IntStream.range(0, rv)
+      (rv, p) -> IntStream.range(0, rv)
                           .parallel()
                           .mapToDouble(p::applyAsDouble)
                           .sum();
@@ -52,7 +53,7 @@ public interface CumulativeOperation {
    * zero up to and including the random variable.
    */
   CumulativeOperation lessThanOrEqual =
-      (p, rv) -> IntStream.rangeClosed(0, rv)
+      (rv, p) -> IntStream.rangeClosed(0, rv)
                           .parallel()
                           .mapToDouble(p::applyAsDouble)
                           .sum();
@@ -62,18 +63,18 @@ public interface CumulativeOperation {
    * operation.
    */
   CumulativeOperation notEqual =
-      (p, rv) -> 1.0 - CumulativeOperation.equal.apply(p, rv);
+      (rv, p) -> 1.0 - CumulativeOperation.equal.apply(rv, p);
 
   /**
    * Computes the 1.0 - result of the lessThanOrEqual cumulative operation.
    */
   CumulativeOperation greaterThan =
-      (p, rv) -> 1.0 - CumulativeOperation.lessThanOrEqual.apply(p, rv);
+      (rv, p) -> 1.0 - CumulativeOperation.lessThanOrEqual.apply(rv, p);
 
   /**
    * Computes the 1.0 - result of the lessThan cumulative operation.
    */
   CumulativeOperation greaterThanOrEqual =
-      (p, rv) -> 1.0 - CumulativeOperation.lessThan.apply(p, rv);
+      (rv, p) -> 1.0 - CumulativeOperation.lessThan.apply(rv, p);
 
 }

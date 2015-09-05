@@ -42,7 +42,7 @@ public abstract class DiscreteProbability implements Probability  {
    */
    double getResult(int randomVariable) {
     return this.getCumulativeOperation()
-               .apply(this::computeResult, randomVariable);
+               .apply(randomVariable, this::computeResult);
   }
 
   /**

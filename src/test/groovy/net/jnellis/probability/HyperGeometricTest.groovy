@@ -63,7 +63,7 @@ class HyperGeometricTest extends Specification {
     int r = 6  // and of which six are special.
     int y = 2  // probability to match all six
     def result = CumulativeOperation.greaterThanOrEqual
-                                    .apply({ HyperGeometric.probability(N, n, r, it) }, y)
+                                    .apply(y){ HyperGeometric.probability(N, n, r, it) }
 
     expect:
     Math.abs(result - 0.145720452843487) < resolution
