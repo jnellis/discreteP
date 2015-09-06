@@ -5,7 +5,6 @@
  * Distributed under MIT License. See accompanying file License.txt or at
  * http://opensource.org/licenses/MIT
  */
-
 package net.jnellis.probability;
 
 import java.util.Objects;
@@ -27,6 +26,58 @@ public abstract class DiscreteProbability implements Probability  {
   }
 
   /**
+   * Returns true if number is greater than or equal to zero
+   * @param number value to check
+   * @return true if non-negative.
+   */
+  public static boolean nonNegative(int number) {
+    return number >= 0;
+  }
+
+  /**
+   * @param probability  a probability value
+   * @return true if  0 &lt;= probability &lt;= 1.0
+   */
+  public static boolean betweenZeroAndOneInclusive(double probability) {
+    return probability >= 0 && probability <= 1.0;
+  }
+
+  /**
+   * Returns the reciprocal.
+   * @param value   a denominator
+   * @return 1.0 / value
+   */
+  public static double reciprocal(double value) {
+    return 1.0d / value;
+  }
+
+  /**
+   * product of two doubles without overflow checks.
+   * @param left   identity
+   * @param right  nextValue
+   * @return left * right
+   */
+  public static double product(double left, double right) {
+    return left * right;
+  }
+
+  /**
+   * greatest common divisor
+   *
+   * @param a an integer
+   * @param b an integer
+   * @return value that divides evenly into both 'a' and 'b'
+   */
+  public static long gcd(long a, long b) {
+    while (b > 0) {
+      long c = a % b;
+      a = b;
+      b = c;
+    }
+    return a;
+  }
+
+  /**
    * Computes the cumulative distribution function of the
    * probability, given the random variable.
    * <p>
@@ -40,7 +91,7 @@ public abstract class DiscreteProbability implements Probability  {
    *                       probability function
    * @return The cumulative probability result.
    */
-   double getResult(int randomVariable) {
+  public double getResult(int randomVariable) {
     return this.getCumulativeOperation()
                .apply(randomVariable, this::computeResult);
   }
@@ -57,39 +108,13 @@ public abstract class DiscreteProbability implements Probability  {
   }
 
   /**
-   * @return  Returns the mean or expected value.
+   * @return The expected value, or mean, for this probability distribution.
    */
   public abstract double getExpectedValue();
 
   /**
    *
-   * @return Returns the variance.
+   * @return The variance (?2) of the probability distribution.
    */
   public abstract double getVariance();
-
-  /**
-   * Returns the reciprocal.
-   */
-  public static double reciprocal(double value) {
-    return 1.0d / value;
-  }
-
-  /**
-   * product of two doubles.
-   */
-  public static double product(double left, double right) {
-    return left * right;
-  }
-
-  /**
-   * greatest common divisor
-   */
-  public static long gcd(long a, long b) {
-    while (b > 0) {
-      long c = a % b;
-      a = b;
-      b = c;
-    }
-    return a;
-  }
 }
