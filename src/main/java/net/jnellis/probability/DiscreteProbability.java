@@ -114,7 +114,7 @@ public abstract class DiscreteProbability implements Probability  {
 
   /**
    *
-   * @return The variance (?2) of the probability distribution.
+   * @return The variance (&#963;&#178;) of the probability distribution.
    */
   public abstract double getVariance();
 }
