@@ -166,8 +166,6 @@ public class HyperGeometric extends DiscreteProbability {
   /**
    * The expected value or population mean is defined by:
    * E(Y) = sampleSize*#successStates / populationSize
-   *
-   * @return The expected value for this probability distribution.
    */
   @Override
   public double getExpectedValue() {
@@ -180,8 +178,6 @@ public class HyperGeometric extends DiscreteProbability {
    * Where N is the population size,
    * n is the sample size,
    * r is the number of success states
-   *
-   * @return The variance (?2) of the probability distribution.
    */
   @Override
   public double getVariance() {
