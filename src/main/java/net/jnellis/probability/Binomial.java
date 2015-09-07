@@ -70,9 +70,6 @@ public class Binomial extends DiscreteProbability {
     this.chanceOfSuccess = chanceOfSuccess;
   }
 
-  /**
-   */
-
   @Override
   public double computeResult(int randomVariable) {
     return probability(trials, chanceOfSuccess, randomVariable);
