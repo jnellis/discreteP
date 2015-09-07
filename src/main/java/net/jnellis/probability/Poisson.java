@@ -23,7 +23,6 @@ package net.jnellis.probability;
  * lambda is 7, the average from which we base the likelihood
  * of traffic accidents happening in a month. The random variable is 14, double
  * the amount of accidents expected.
- * <p>
  * <pre>
  * double result = Poisson.probability(7,14);  // less than 1% chance.
  * </pre>
