@@ -1,3 +1,11 @@
+/*
+ * GeometricTest.groovy
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability
 import spock.lang.Specification
 /**
@@ -24,5 +32,10 @@ class GeometricTest extends Specification {
     Geometric gp = new Geometric(CumulativeOperation.lessThanOrEqual, chanceOfSuccess);
     expect:
     gp.getResult(trialOfSuccess) - 0.225144906484 < resolution
+  }
+
+  def "Shooting yourself on the third round of russian roulette"() {
+    expect:
+    Math.abs(Geometric.probability(1.0d / 6, 3) - (25.0d / 216)) < resolution
   }
 }
