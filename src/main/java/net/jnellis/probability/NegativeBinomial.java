@@ -25,7 +25,6 @@ package net.jnellis.probability;
  * a one EXACTLY three times with the last one happening
  * on the sixth roll. Here K=3, Y=6 and the chance to roll
  * a one is 1/6
- * <p>
  * <pre>
  * double result = NegativeBinomial.probability(3, 1.0/6, 6);
  * </pre>
@@ -34,7 +33,8 @@ package net.jnellis.probability;
  * three ones in six or less attempts.
  * <pre>
  * CumulativeOperation.lessThanOrEqual
- *                    .apply(6, y-> NegativeBinomial.probability(3, 1.0/6, y));
+ *                    .apply(6, y-&gt; NegativeBinomial.probability(3, 1.0/6,
+ *                    y));
  * </pre>
  */
 public class NegativeBinomial extends DiscreteProbability {
@@ -42,7 +42,13 @@ public class NegativeBinomial extends DiscreteProbability {
   final int successfulTrials;
   final double chanceOfSuccess;
 
-  /*	The Negative Binomial Probability  */
+  /**
+   * Creates a representation of the Negative binomial distribution.
+   *
+   * @param rvOperation      The total number of trials, the random variable.
+   * @param successfulTrials expected number of successful trials
+   * @param chanceOfSuccess  chance of success for a single trial.
+   */
   public NegativeBinomial(CumulativeOperation rvOperation,
                           int successfulTrials,
                           double chanceOfSuccess) {
@@ -58,27 +64,23 @@ public class NegativeBinomial extends DiscreteProbability {
     return probability(successfulTrials, chanceOfSuccess, randomVariable);
   }
 
-
-  /*	Constructor Parameters:
-      y - number of the trial that the kth success happens; must be 0 <= Y
-      k - number of successful trials; must be 0 <= K <= Y
-      p - chance of success for each trial; must be 0.0 <= p <= 1.0
-      rvOperation - Random variable comparison. Whether this probability is
-      cumulative and which
-      way it is.
-  */
-
   /**
    * Computes the Negative binomial probability.
    *
-   * @param k number of successful trials
-   * @param p chance of a successful trial
-   * @param y total number of trials
+   * @param successfulTrials number of successful trials
+   * @param chanceOfSuccess  chance of a successful trial
+   * @param totalTrials      total number of trials
    * @return probability of this event
    */
-  public static double probability(int k, double p, int y) {
+  public static double probability(int successfulTrials,
+                                   double chanceOfSuccess,
+                                   int totalTrials) {
     /*  The equation for this probability is based on the equation that counts
      *  failures instead of total trials and successes.
+     *  where x is failed trials,
+     *        k is successful trials
+     *        p is chance of success
+     *        y is total trials
      *  P(x) = (x + k - 1)C(k - 1) * p^k * (1-p)^(x)
      *  but when x = y-k
      *  P(y) = ((y-k)+k-1)C(k - 1) * p^k * (1-p)^(y-k)
@@ -86,87 +88,71 @@ public class NegativeBinomial extends DiscreteProbability {
      *       = (y-1)!/(((y-1)-(k-1))!(k-1)!) * p^k * (1-p)^(y-k)
      */
     // validate
-    assert DiscreteProbability.nonNegative(k)
+    assert DiscreteProbability.nonNegative(successfulTrials)
         : "Number of successful trials must non-negative";
-    assert DiscreteProbability.betweenZeroAndOneInclusive(p)
+    assert DiscreteProbability.betweenZeroAndOneInclusive(chanceOfSuccess)
         : "Chance of a successful trial must be between zero and one.";
     // the base class function GetResult will possibly
     // set our number of trials below K so just return 0.0;
-    if (k > y || y == 0)
+    if (successfulTrials > totalTrials || totalTrials == 0)
       return 0.0;
-
 
     // initialize some variables
     double result = 1.0;
-    double q = 1.0 - p;
+    double chanceOfFailure = 1.0 - chanceOfSuccess;
     // check optimizations
-    if (k == y) {
-      return result = Math.pow(p, k);
+    if (successfulTrials == totalTrials) {
+      return Math.pow(chanceOfSuccess, successfulTrials);
     }
-    if (k == 1) {
-      return result = Math.pow(q, y);
+    if (successfulTrials == 1) {
+      return Math.pow(chanceOfFailure, totalTrials);
     }
 
-    // cancellation optimization, the higher denominator term cancels out.
+    // cancellation optimization, the larger denominator term cancels out.
     // (y-1)!/(((y-1)-(k-1))!(k-1)!)
-    final int range = Integer.min((y - 1) - (k - 1), (k - 1));
-    int np = k;
-    int nq = y - k;
+    final int range = Integer.min((totalTrials - 1) - (successfulTrials - 1),
+                                  (successfulTrials - 1));
+    int pees = successfulTrials;
+    int ques = totalTrials - successfulTrials;
     int denoms = range;
-    int numers = y - 1;
+    int numers = totalTrials - 1;
+    int numerFloor = totalTrials - 1 - range;
 
-    while (np > 0 || nq > 0 || denoms > 0 || numers > (y - 1 - range)) {
-      // If the result is greater than one we want to divide by 
-      // a denominator digit or multiply by percentage p or q.
-      // If we are out of numerator digits then finish multiplying
-      // with our powers of p or q or dividing by a denom digit.
-      if (result >= 1.0 || numers == (y - 1 - range)) {
+    while (pees > 0 || ques > 0 || denoms > 0 || numers > numerFloor) {
+      if (result >= 1.0 || numers == numerFloor) {
         if (denoms > 0) {
-          //m_resut *= (1.0/ndenom);
           result /= denoms;
           --denoms;
-        } else if (nq > 0) {
-          result *= q;
-          --nq;
-        } else if (np > 0) {
-          result *= p;
-          --np;
+        } else if (ques > 0) {
+          result *= chanceOfFailure;
+          --ques;
         } else {
-          throw new IllegalStateException("Binomial Probability computation " +
-                                              "error- check success " +
-                                              "percentage between 0 and 1");
-        }
-      }
-      // If the result is less than one then we want to multiply
-      // by a numerator digit. If we are out of denominator digits,
-      // powers of p or powers of q then multiply rest of result 
-      // by numerator digits.
-      else if (result < 1.0 || np == 0 /* || nq ==0 || ndenom ==0 */) {
-        if (numers > (y - 1 - range)) {
-          result *= numers;
-          --numers;
-        } else {
-          throw (new IllegalStateException("Binomial Probability computation " +
-                                               "error- unknown error"));
+          result *= chanceOfSuccess;
+          --pees;
         }
       } else {
-        throw (new IllegalStateException("Binomial Probability computation " +
-                                             "error- possible value " +
-                                             "infinity or YaY"));
+        result *= numers;
+        --numers;
       }
     }
     return result;
   }
 
-  // The Expected Value is defined by
-// E(Y) = K / p
+  /**
+   * The Expected Value is defined by
+   * E(Y) = successfulTrials / chanceOfSuccess
+   */
   @Override
   public double getExpectedValue() {
     return successfulTrials / chanceOfSuccess;
   }
 
-  // The variance is defined by
-// o^2 = K*(1-p)/p^2
+  /**
+   * The variance is defined by
+   * o^2 = k * (1-p)/p^2
+   * where k is the # successful trials,
+   * p is chance of success
+   */
   @Override
   public double getVariance() {
     return successfulTrials * (1 - chanceOfSuccess) / (chanceOfSuccess *
