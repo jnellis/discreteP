@@ -1,3 +1,11 @@
+/*
+ * Memoizer.java
+ *
+ * Copyright (c) 2015. Joe Nellis
+ * Distributed under MIT License. See accompanying file License.txt or at
+ * http://opensource.org/licenses/MIT
+ */
+
 package net.jnellis.probability;
 
 import java.util.Map;
@@ -5,20 +13,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.IntToDoubleFunction;
 
 /**
- * User: Joe Nellis
- * Date: 8/14/2015
- * Time: 11:46 AM
+ * A memoizer for Probability classes.
  */
 public class Memoizer {
   private final Map<Integer,Double> cache = new ConcurrentHashMap<>();
 
   private Memoizer() {}
 
-  private IntToDoubleFunction  doMemoize(final IntToDoubleFunction function) {
-    return key -> cache.computeIfAbsent(key, function::applyAsDouble);
+  /**
+   * Creates a memoized probability function, or any integer to double function.
+   * <p>
+   * <pre>
+   * Probability pdf = y -&gt; HyperGeometric.probability(80000,40000,10000,y);
+   * Probability memoizedPdf = (Probability)Memoizer.memoize(pdf);
+   * </pre>
+   *
+   * @param pdf The probability distribution function to be memoized.
+   * @return a memoized IntToDouble function. Can be cast to Probability.
+   */
+  public static IntToDoubleFunction memoize(final IntToDoubleFunction pdf) {
+    return new Memoizer().doMemoize(pdf);
   }
 
-  public static IntToDoubleFunction memoize(final IntToDoubleFunction function) {
-    return new Memoizer().doMemoize(function);
+  private IntToDoubleFunction  doMemoize(final IntToDoubleFunction function) {
+    return key -> cache.computeIfAbsent(key, function::applyAsDouble);
   }
 }
