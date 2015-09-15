@@ -54,16 +54,16 @@ class BinomialTest extends Specification {
 
     where:
     N   | p           | rv  | result
-    1   | 0.0         | 0   | 1d
-    1   | 0.0         | 1   | 0
-    1   | 1.0d        | 0   | 0
+    1  | 0.0d  | 0  | 1d
+    1  | 0.0d  | 1  | 0d
+    1  | 1.0d  | 0  | 0d
     1   | 1.0d        | 1   | 1d
-    2   | 1.0d        | 0   | 0
-    2   | 1.0d        | 1   | 0
+    2  | 1.0d  | 0  | 0d
+    2  | 1.0d  | 1  | 0d
     2   | 1.0d        | 2   | 1d
     17  | 0.5d        | 7   | 0.14837646484375d
     67  | 0.99d       | 67  | 0.509985746249565d
-    67  | 0.01d       | 67  | 0
+    67 | 0.01d | 67 | 0d
     600 | 1.0d / 3.0d | 200 | 0.0345326241871131d
   }
 
@@ -76,17 +76,17 @@ class BinomialTest extends Specification {
 
     where:
     N   | p           | rv  | result
-    1   | 0.0         | 0   | 0
-    1   | 0.0         | 1   | 1
-    1   | 1.0         | 0   | 0
-    1   | 1.0         | 1   | 0
-    2   | 1.0         | 0   | 0
-    2   | 1.0         | 1   | 0
-    2   | 1.0         | 2   | 0
-    17  | 0.5         | 7   | 0.166152954101563
-    67  | 0.99        | 67  | 0.490014253750435
-    67  | 0.01        | 67  | 1
-    600 | 1.0d / 3.0d | 200 | 0.484649326421801
+    1   | 0.0d        | 0   | 0d
+    1   | 0.0d        | 1   | 1d
+    1   | 1.0d        | 0   | 0d
+    1   | 1.0d        | 1   | 0d
+    2   | 1.0d        | 0   | 0d
+    2   | 1.0d        | 1   | 0d
+    2   | 1.0d        | 2   | 0d
+    17  | 0.5d        | 7   | 0.166152954101563d
+    67  | 0.99d       | 67  | 0.490014253750435d
+    67  | 0.01d       | 67  | 1d
+    600 | 1.0d / 3.0d | 200 | 0.484649326421801d
   }
 
 
@@ -120,11 +120,12 @@ class BinomialTest extends Specification {
 
   def "test cumulative probability with high number of trials"() {
     setup:
-    def trials = 8009
-    def chanceOfSuccess = 0.5
-    def result = new Binomial(lessThanOrEqual, trials, chanceOfSuccess).getResult(rv)
+    int trials = 8009
+    double chanceOfSuccess = 0.5d
 
     expect:
+    double result = new Binomial(lessThanOrEqual, trials, chanceOfSuccess)
+        .getResult(rv as int)
     Math.abs(result - 0.473273430936) < resolution * 1E5
     // 4001 adds of small decimal numbers loses resolution
     where:
@@ -134,9 +135,9 @@ class BinomialTest extends Specification {
 
   def "test exact probability with high number of trials"() {
     setup:
-    def trials = 80009
-    def chanceOfSuccess = 0.5
-    def result = Binomial.probability(trials, chanceOfSuccess, rv);
+    int trials = 80009
+    double chanceOfSuccess = 0.5
+    def result = Binomial.probability(trials, chanceOfSuccess, rv as int);
 
     expect:
     Math.abs(result - 0.0028199161817) < resolution * 1E3
@@ -146,13 +147,13 @@ class BinomialTest extends Specification {
 
   }
 
-  def "test cumulative probabilty with medium high number of trials"() {
+  def "test cumulative probability with medium high number of trials"() {
     setup:
     def trials = 997
     def chanceOfSuccess = 0.55
 
     expect:
-    double result = new Binomial(lessThanOrEqual, trials, chanceOfSuccess).getResult(rv)
+    double result = new Binomial(lessThanOrEqual, trials, chanceOfSuccess).getResult(rv as int)
     Math.abs(result - 0.00219083926527885) < resolution
     where:
     rv << 503

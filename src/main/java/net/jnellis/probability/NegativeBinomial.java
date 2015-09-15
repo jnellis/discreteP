@@ -39,8 +39,8 @@ package net.jnellis.probability;
  */
 public class NegativeBinomial extends DiscreteProbability {
 
-  final int successfulTrials;
-  final double chanceOfSuccess;
+  private final int successfulTrials;
+  private final double chanceOfSuccess;
 
   /**
    * Creates a representation of the Negative binomial distribution.

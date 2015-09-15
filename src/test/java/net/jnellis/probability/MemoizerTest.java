@@ -29,13 +29,13 @@ public class MemoizerTest {
     CumulativeOperation.lessThanOrEqual.apply(10000, memoizedPdf);
     long end = System.currentTimeMillis();
     long diff1 = end - start;
-    System.out.println("Memoizer test: first pass " + diff1 + "ms.");
+    //System.out.println("Memoizer test: first pass " + diff1 + "ms.");
 
     start = System.currentTimeMillis();
     CumulativeOperation.lessThanOrEqual.apply(10000, memoizedPdf);
     end = System.currentTimeMillis();
     long diff2 = end - start;
-    System.out.println("Memoizer test: second pass " + diff2 + "ms.");
+    //System.out.println("Memoizer test: second pass " + diff2 + "ms.");
 
     // is it at least 100 times faster?
     assert diff1 > 100 * diff2;

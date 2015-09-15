@@ -11,9 +11,7 @@ package net.jnellis.probability
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static net.jnellis.probability.CumulativeOperation.equal
-import static net.jnellis.probability.CumulativeOperation.lessThan
-import static net.jnellis.probability.CumulativeOperation.lessThanOrEqual
+import static net.jnellis.probability.CumulativeOperation.*
 
 /**
  * User: Joe Nellis
@@ -62,8 +60,7 @@ class HyperGeometricTest extends Specification {
     int n = 6  // of which only six are chosen
     int r = 6  // and of which six are special.
     int y = 2  // probability to match all six
-    def result = CumulativeOperation.greaterThanOrEqual
-                                    .apply(y){ HyperGeometric.probability(N, n, r, it) }
+    def result = greaterThanOrEqual.apply(y) { HyperGeometric.probability(N, n, r, it) }
 
     expect:
     Math.abs(result - 0.145720452843487) < resolution
@@ -72,10 +69,6 @@ class HyperGeometricTest extends Specification {
 
   @Unroll
   def "test cumulative #N samples, #n samplesChosen, #r specialSamples, P(y<#y) is #result"() {
-    setup:
-    System.out.println("test cumulative $N samples, $n samplesChosen, $r specialSamples, P(y<$y) " +
-        "is $result")
-
     expect:
     double probability = new HyperGeometric(lessThan, N, n, r).getResult(y)
     Math.abs(probability - result) < resolution
@@ -100,7 +93,7 @@ class HyperGeometricTest extends Specification {
     def r = 10000
     def y = 10000
     def result = new HyperGeometric(lessThanOrEqual, N, n, r).getResult(y)
-    println "error is ${result - 1.0}"
+    //println "error is ${result - 1.0}"
     expect:
     assert result != 0
     Math.abs(result -  1.0)< resolution
@@ -115,7 +108,7 @@ class HyperGeometricTest extends Specification {
     def result = HyperGeometric.probability(N, n, r, y)
     // mega number is 1-27, of which we need one. so 1/27.
     result = result / 27
-    println "chance to win jackpot is 1 in ${(int)DiscreteProbability.reciprocal(result)}"
+    //println "chance to win jackpot is 1 in ${(int)DiscreteProbability.reciprocal(result)}"
     expect:
     // ca lotto web site says roughly 1 in 42million
     Math.abs(result - 1/42000000) <  1.0E-9   // within a million
