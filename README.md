@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jnellis/discreteP.svg?branch=master)](https://travis-ci.org/jnellis/discreteP)
+
 # Compute discrete probabilities. 
 
 ## Five distributions: 
