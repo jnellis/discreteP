@@ -22,7 +22,6 @@ public class Memoizer {
 
   /**
    * Creates a memoized probability function, or any integer to double function.
-   * <p>
    * <pre>
    * Probability pdf = y -&gt; HyperGeometric.probability(80000,40000,10000,y);
    * Probability memoizedPdf = (Probability)Memoizer.memoize(pdf);

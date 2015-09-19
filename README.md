@@ -120,10 +120,32 @@ interested in is 3, for the number of minorities and we are interested in when
 P(Y=3) or when all the minorities are chosen.
     
     HyperGeometric.probability(20, 4, 3, 3); // P(Y=3) =  0.35087719298245615% 
+    
+## Memoizer ##
+There is a memoizer for caching a Probability's computeResult method reference. 
 
-So we see that the chance of all minorities getting picked for heavy labor positions is less
-than 1% so the minorities have a solid discrimination case.
-
-
+    // Create a probability distribution function on the fly
+    Probability pdf = y -> HyperGeometric.probability(80000, 40000, 10000, y);
+    IntToDoubleFunction memoizedPdf = Memoizer.memoize(pdf::computeResult);
+ 
+    // computes pdf ten thousand times
+    CumulativeOperation.lessThanOrEqual.apply(10000, memoizedPdf);
+    // no computation done here, just summing of cached values
+    // even though the cumulative operation is different.
+    CumulativeOperation.greaterThanOrEqual.apply(10000, memoizedPdf);
+    
+## Implementation notes ##
+The implementation does not use BigDecimal or BigInteger, nor does it compute factorials
+in the traditional fashion. All algorithm implementations use a counting strategy which 
+separates factors in the probability equation into either 'increasing' or 'decreasing' 
+values. Then a running product is computed that hovers around 1.0 by multiplying 
+by increasing values when the product is less than one and by multiplying decreasing
+values when the product is greater than one. This prevents overflow and loss of significant 
+digits and seems to be faster than BigDecimal, Monte Carlo methods, or using rational types to get 
+exact ratios. Most distributions seem to be stable to at least 12 decimal places while
+larger cumulative operations can be as low as 8 decimal place accuracy. I suppose it 
+depends on the hardware, strictfp was not used. It's at this point though that maybe 
+population/trial sizes are large enough to be modeled by a different distribution. 
+See the Spock tests for more insight.
     
     
