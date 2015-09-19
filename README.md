@@ -42,7 +42,7 @@ probability.
 
 ```
 double greaterThanOrEqualTo3 = CumulativeOperation.greaterThanOrEqual
-                                                      .apply(3,pdf::computeResult);
+                                                  .apply(3,pdf::computeResult);
 ```
 
 ## Binomial ##
