@@ -8,10 +8,12 @@
 
 package net.jnellis.probability
 
+import org.apache.commons.math3.distribution.PascalDistribution
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static net.jnellis.probability.CumulativeOperation.lessThan
+import static net.jnellis.probability.CumulativeOperation.lessThanOrEqual
 
 /**
  * User: Joe Nellis
@@ -80,6 +82,61 @@ class NegativeBinomialTest extends Specification {
     2   | 0   | 0.0d        | 1d
     2   | 0   | 1.0d        | 0d
     2   | 1   | 0.0d        | 0d
+    2   | 1   | 1.0d        | 1d
+    2   | 1   | 0.5d        | 0.5d
+    2   | 2   | 0.5d        | 0d
+    7   | 7   | 0.5d        | 0d
+    7   | 6   | 0.5d        | 0.015625d
+    7   | 1   | 0.5d        | 0.984375d
+    67  | 67  | 0.99d       | 0d
+    67  | 67  | 0.01d       | 0d
+    97  | 29  | 0.13d       | 8.16092292681E-6d
+    600 | 200 | 1.0d / 6.0d | 0d
+  }
+
+  @Unroll
+  def "test against apache commons math; #rv trials with #k k successes of #p success each P(Y=#rv) = #result"() {
+    expect:
+    double expected = new PascalDistribution(k,p).probability(rv-k)
+    double result = NegativeBinomial.probability(k, p, rv)
+
+//    println expected
+//    println result
+//    println check
+//    println()
+
+    Math.abs(expected - result) < resolution
+    where:
+    rv  | k   | p           | check
+    0   | 1   | 0.0d        | 0d
+    0   | 1   | 0.0d        | 0d
+    1   | 1   | 0.0d        | 0d
+    1   | 1   | 0.4d        | 0.4d
+    1   | 1   | 1.0d        | 1d
+    2   | 2   | 1.0d        | 1d
+    7   | 7   | 0.5d        | 0.0078125d
+    7   | 1   | 0.5d        | 0.0078125d
+    67  | 67  | 0.99d       | 0.509985746249565d
+    67  | 67  | 0.01d       | 0d
+    97  | 29  | 0.13d       | 2.03909902925015E-06d
+    600 | 200 | 1.0d / 6.0d | 4.16020180421793E-24d
+  }
+
+  @Unroll
+    def "cumulative test against apache commons math; #rv trials with #k successes of #p success each; P(Y<#rv) = #result"() {
+      expect:
+      double expected = new PascalDistribution(k,p).cumulativeProbability(rv-k)
+      double result = new NegativeBinomial(lessThanOrEqual,k, p).getResult(rv) 
+
+//      println expected
+//      println result
+//      println check
+//      println()
+
+      Math.abs(expected - result) < resolution
+
+    where:
+    rv  | k   | p           | check 
     2   | 1   | 1.0d        | 1d
     2   | 1   | 0.5d        | 0.5d
     2   | 2   | 0.5d        | 0d

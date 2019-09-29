@@ -8,11 +8,11 @@
 
 package net.jnellis.probability
 
+import org.apache.commons.math3.distribution.PoissonDistribution
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static net.jnellis.probability.CumulativeOperation.*
-
 /**
  * User: Joe Nellis
  * Date: 8/21/2015 
@@ -89,5 +89,50 @@ class PoissonTest extends Specification {
     Math.abs(result - poissPdf) < resolution
   }
 
+  @Unroll
+  def "test against apache commons math (lambda: #lambda, P(Y=#y))"(){
+
+    expect:
+    def expected = new PoissonDistribution(lambda).probability(y)
+    def result = Poisson.probability(lambda, y)
+//    println expected
+//    println result
+//    println check
+//    println()
+
+    Math.abs(expected - result) < resolution
+
+    where:
+    lambda      | y | check
+    0.1         | 0 | 0.90483741803596
+    0.1         | 1 | 0.090483741803596
+    1           | 0 | 0.367879441171442
+    1           | 1 | 0.367879441171442
+    Math.exp(1) | 0 | 0.0659880358452496
+    Math.exp(1) | 1 | 0.179374078733909
+  }
+  @Unroll
+  def "cumulative test against apache commons math; (lambda: #lambda, P(Y&lt;=#y))"() {
+
+    expect:
+    def expected = new PoissonDistribution(lambda).cumulativeProbability(y)
+    def result = new Poisson(lessThanOrEqual,lambda).getResult(y)  
+
+//    println expected
+//    println result
+//    println check
+//    println()
+
+    Math.abs(expected - result) < resolution
+
+    where:
+    lambda      | y | check
+    0.1         | 0 | 0.0
+    0.1         | 1 | 0.90483741803596
+    1           | 0 | 0.0
+    1           | 1 | 0.367879441171442
+    Math.exp(1) | 0 | 0.0
+    Math.exp(1) | 1 | 0.06598803584524
+  }
 
 }

@@ -157,9 +157,15 @@ by increasing values when the product is less than one and by multiplying decrea
 values when the product is greater than one. This prevents overflow and loss of significant 
 digits and seems to be faster than BigDecimal, Monte Carlo methods, or using rational types to get 
 exact ratios. Most distributions seem to be stable to at least 12 decimal places while
-larger cumulative operations can be as low as 8 decimal place accuracy. I suppose it 
-depends on the hardware, strictfp was not used. It's at this point though that maybe 
-population/trial sizes are large enough to be modeled by a different distribution. 
-See the Spock tests for more insight.
+larger cumulative operations can be as low as 8 decimal place accuracy.
+
+In comparison to Apache Commons Math, performance usually can't be matched as this implementation
+strategy is bound by O(N) where as commons math is O(1) as it uses the incomplete beta function to 
+compute cumulative probabilities. As long as you skip generation of the random number generator
+in the commons math distributions, performance will be better than this library for smaller (N<1000)
+on average. The geometric distribution is slightly different with commons math as well as the 
+negative binomial which matches what is called the Pascal distribution in commons math. 
+
+See the Spock tests and JMH benchmarks for more insight.
     
     
