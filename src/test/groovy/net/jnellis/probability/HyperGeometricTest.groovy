@@ -8,6 +8,7 @@
 
 package net.jnellis.probability
 
+import org.apache.commons.math3.distribution.HypergeometricDistribution
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -112,5 +113,54 @@ class HyperGeometricTest extends Specification {
     expect:
     // ca lotto web site says roughly 1 in 42million
     Math.abs(result - 1/42000000) <  1.0E-9   // within a million
+  }
+
+  @Unroll
+  def "test against apache commons math (Pop:#N, sample:#n, successes:#r, y:#y)"(){
+
+    expect:
+    double expected = new HypergeometricDistribution(N,r, n ).probability(y)
+    double result  =  HyperGeometric.probability( N, n, r, y)
+    Math.abs(expected - result) < resolution
+//    println expected
+//    println result
+//    println check
+//    println()
+
+
+    where:
+    N   | n   | r  | y  | check
+    1   | 1   | 1  | 0  | 0d
+    2   | 1   | 1  | 0  | 0.5d
+    2   | 1   | 1  | 1  | 0.5d
+    9   | 3   | 3  | 3  | 0.011904761904761897d
+    55  | 31  | 5  | 3  | 0.35662697149933564d
+    277 | 157 | 57 | 33 | 0.116862766002871d
+    301 | 300 | 30 | 30 | 0.900332225913621d
+    10  | 7   | 5  | 1  | 0d
+  }
+
+  @Unroll
+  def "cumulative test against apache commons math (Pop:#N, sample:#n, successes:#r, y:#y)"(){
+
+    expect:
+    double expected = new HypergeometricDistribution(N,r, n ).cumulativeProbability(y)
+    double result  =  new HyperGeometric(lessThanOrEqual, N, n, r).getResult(y)
+    Math.abs(expected - result) < resolution
+//    println expected
+//    println result
+//    println()
+
+
+    where:
+    N   | n   | r  | y
+    1   | 1   | 1  | 0
+    2   | 1   | 1  | 0
+    2   | 1   | 1  | 1
+    9   | 3   | 3  | 3
+    55  | 31  | 5  | 3
+    277 | 157 | 57 | 33
+    301 | 300 | 30 | 30
+    10  | 7   | 5  | 1
   }
 }

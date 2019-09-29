@@ -1,9 +1,16 @@
+plugins {
+  id "io.morethan.jmhreport" version "0.6.2.1"
+}
+version = 2.1
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
+apply from: 'jmh.gradle'
 
-repositories{
-	mavenCentral()
+
+repositories {
+  mavenCentral()
 }
 
 
@@ -11,9 +18,31 @@ dependencies {
   compile 'org.slf4j:slf4j-api:1.7.7'
 
   testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+  testCompile 'org.apache.commons:commons-math3:3.6.1'
 }
 
 properties.sourceCompatability = "1.8"
 properties.targetCompatability = "1.8"
 
 
+def prj = project 
+def reportsDir =  "$prj.buildDir/reports/jmh/"
+mkdir reportsDir
+def reportFile = prj.file("$reportsDir/result.json")
+
+jmh{
+  include = [".*"]
+  benchmarkMode = ['avgt']
+  iterations = 10
+  fork = 1
+  timeOnIteration = '400ms'
+  timeUnit = 'us'
+  warmup = '400ms'
+  warmupIterations = 5
+  resultFormat = 'JSON'
+  resultsFile = reportFile
+  includeTests = true
+}
+
+tasks.jmh.finalizedBy tasks.jmhReport
+ 

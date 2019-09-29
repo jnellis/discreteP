@@ -25,15 +25,15 @@ public class MemoizerTest {
     Probability pdf = y -> HyperGeometric.probability(80000, 40000, 10000, y);
     IntToDoubleFunction memoizedPdf = Memoizer.memoize(pdf::computeResult);
 
-    long start = System.currentTimeMillis();
+    long start = System.nanoTime();
     CumulativeOperation.lessThanOrEqual.apply(10000, memoizedPdf);
-    long end = System.currentTimeMillis();
+    long end = System.nanoTime();
     long diff1 = end - start;
     //System.out.println("Memoizer test: first pass " + diff1 + "ms.");
 
-    start = System.currentTimeMillis();
+    start = System.nanoTime();
     CumulativeOperation.lessThanOrEqual.apply(10000, memoizedPdf);
-    end = System.currentTimeMillis();
+    end = System.nanoTime();
     long diff2 = end - start;
     //System.out.println("Memoizer test: second pass " + diff2 + "ms.");
 

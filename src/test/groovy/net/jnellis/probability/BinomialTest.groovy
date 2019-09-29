@@ -8,6 +8,7 @@
 
 package net.jnellis.probability
 
+import org.apache.commons.math3.distribution.BinomialDistribution
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -54,16 +55,16 @@ class BinomialTest extends Specification {
 
     where:
     N   | p           | rv  | result
-    1  | 0.0d  | 0  | 1d
-    1  | 0.0d  | 1  | 0d
-    1  | 1.0d  | 0  | 0d
+    1   | 0.0d        | 0   | 1d
+    1   | 0.0d        | 1   | 0d
+    1   | 1.0d        | 0   | 0d
     1   | 1.0d        | 1   | 1d
-    2  | 1.0d  | 0  | 0d
-    2  | 1.0d  | 1  | 0d
+    2   | 1.0d        | 0   | 0d
+    2   | 1.0d        | 1   | 0d
     2   | 1.0d        | 2   | 1d
     17  | 0.5d        | 7   | 0.14837646484375d
     67  | 0.99d       | 67  | 0.509985746249565d
-    67 | 0.01d | 67 | 0d
+    67  | 0.01d       | 67  | 0d
     600 | 1.0d / 3.0d | 200 | 0.0345326241871131d
   }
 
@@ -160,4 +161,69 @@ class BinomialTest extends Specification {
 
   }
 
+  def "test against apache commons math"() {
+
+    expect:
+    double result = new Binomial(equal, trials, chanceOfSuccess).getResult(rv as int)
+    double expected = new BinomialDistribution(null, trials, chanceOfSuccess).probability(rv
+        as int) 
+    Math.abs(result - expected) < resolution
+
+    where:
+    trials | chanceOfSuccess | rv
+    50     | 0.50d           | 8
+    5      | 0.02d           | 3
+    997    | 0.55d           | 503
+    8009   | 0.5d            | 4001
+    80009  | 0.5d            | 40001
+    800009 | 0.5d            | 400001
+  }
+
+  @Unroll
+  def "cumulative test against apache commons math (trials #trials)"() {
+
+    expect:
+    double result = new Binomial(lessThanOrEqual, trials, chanceOfSuccess).getResult(rv as int)
+    double expected = new BinomialDistribution(null,trials, chanceOfSuccess).cumulativeProbability(rv
+        as int)
+    Math.abs(result - expected) < resolution
+
+    where:
+    trials | chanceOfSuccess | rv
+    50     | 0.50d           | 8
+    5      | 0.02d           | 3
+    997    | 0.55d           | 503
+    8009   | 0.5d            | 4001
+  }
+
+  def "test against BigDecimal solution"() {
+
+    expect:
+    // n! /((n-y)! * y!) * p^(y) * q^(n-y)
+    def q = 1.0 - p
+    def ny = n - y
+
+    def result = fact(n) / (fact(ny) * fact(y)) * (p**y) * (q**ny)
+    def r2 = new Binomial(equal, n, p as double).getResult(y)
+    Math.abs(result.toDouble() - r2) < resolution
+
+    where:
+    n    | p    | y
+    50   | 0.50 | 8
+    5    | 0.02 | 3
+    997  | 0.55 | 503
+  }
+
+
+  public static BigInteger fact(long n) {
+    if (n < 0) {
+      throw new RuntimeException("Trying to take factorial of negative number.");
+    }
+    BigInteger result = BigInteger.ONE
+    while (n > 1) {
+      result = result.multiply(BigInteger.valueOf(n))
+      n--
+    }
+    return result
+  }
 }
